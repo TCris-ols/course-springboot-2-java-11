@@ -11,7 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.educandoweb.course.entities.pk.OrderItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tb_product")
@@ -28,18 +32,13 @@ public class Product implements Serializable {
 	private String imgUrl;
 
 	@ManyToMany
-
 	@JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category"))
 	private Set<Category> categories = new HashSet<>();
 
-	public Set<Category> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(Set<Category> categories) {
-		this.categories = categories;
-	}
-
+	@OneToMany(mappedBy = "id.product")
+	private Set<OrderItem> items = new HashSet<>();
+	
+	
 	public Product() {
 	}
 
@@ -92,6 +91,23 @@ public class Product implements Serializable {
 		this.imgUrl = imgUrl;
 	}
 
+	public Set<Category> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Set<Category> categories) {
+		this.categories = categories;
+	}
+	
+	@JsonIgnore
+	public Set<Order> getOrders(){
+		Set<Order> set = new HashSet<>();
+		for(OrderItem x : items) {
+			set.add(x.getOrder());
+		}
+		return set;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
